@@ -27,7 +27,7 @@
 | **Password** | пароль |
 | **Role** | роль |
 
-Если в вашей базе таблица или поля называются иначе, **не нужно переделывать базу только ради этого примера**. Просто замените имена в классе **User** и настройке **OnModelCreating**.
+Если в вашей базе таблица или поля называются иначе, **не нужно переделывать базу только ради этого примера**. Просто приведите модель **User** в соответствие с вашей базой.
 
 Роли из задания:
 
@@ -152,29 +152,6 @@ public class AppDbContext : DbContext
             "Server=localhost;Database=DemoExam2026;Trusted_Connection=True;TrustServerCertificate=True;");
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>().ToTable("Users");
-
-        modelBuilder.Entity<User>()
-            .HasKey(user => user.Id);
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Fio)
-            .HasColumnName("Fio");
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Login)
-            .HasColumnName("Login");
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Password)
-            .HasColumnName("Password");
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Role)
-            .HasColumnName("Role");
-    }
 }
 ~~~
 
@@ -640,7 +617,7 @@ fio
 Fio
 ~~~
 
-Настройте соответствие через **HasColumnName**.
+Приведите имя свойства модели в соответствие с реальным столбцом базы.
 
 ### Ошибка 3. Неправильная строка подключения
 
@@ -954,34 +931,15 @@ MainForm(null)
 
 ---
 
-# 95. Что такое mapping
+# 95. Если структура БД отличается от модели
 
-Mapping — это настройка соответствия между C# и базой.
+Если таблица или столбцы в вашей базе называются иначе, чем в классе `User`, EF Core нужно явно сообщить об этом.
 
-Например:
+Для этого используется настройка модели через `OnModelCreating`.
 
-~~~text
-C#                         БД
+**В основном примере этот код не нужен**, потому что мы специально используем одинаковые названия `Users`, `Id`, `Fio`, `Login`, `Password`, `Role`.
 
-User                       Users
-User.Id                    Users.Id
-User.Fio                   Users.Fio
-User.Login                 Users.Login
-User.Password              Users.Password
-User.Role                  Users.Role
-~~~
-
-Если в базе столбец называется user_login, можно настроить:
-
-~~~text
-User.Login
-    ↓
-Users.user_login
-~~~
-
-Именно для этого используется HasColumnName.
-
-Поэтому перед написанием модели полезно посмотреть реальную структуру БД.
+Например, если в реальной базе таблица называется `user_accounts`, а столбец для логина — `user_login`, тогда уже понадобится дополнительная настройка соответствия.
 
 ---
 
@@ -1131,7 +1089,7 @@ AuthService
 
 Если ошибка подключения — сначала проверяйте SQL Server и connection string.
 
-Если ошибка таблицы — проверяйте mapping.
+Если ошибка связана с таблицей или столбцом — проверьте соответствие модели структуре БД.
 
 Если пользователь не находится — проверяйте данные в БД.
 
@@ -1164,33 +1122,11 @@ AuthService
 
 # 102. Что делать, если таблица называется не Users
 
-Не нужно менять базу только ради инструкции.
+Если структура вашей базы отличается от примера, не нужно переделывать базу только ради инструкции.
 
-Измените mapping:
+Нужно настроить соответствие модели реальной структуре БД. Для этого в EF Core используется `OnModelCreating`.
 
-~~~text
-User
-   ↓
-ToTable("реальное имя таблицы")
-~~~
-
-Если отличается столбец:
-
-~~~text
-User.Login
-   ↓
-HasColumnName("реальное имя столбца")
-~~~
-
-Главная идея:
-
-~~~text
-C# модель
-   ↓
-mapping
-   ↓
-реальная БД
-~~~
+Если структура совпадает с примером `Users(Id, Fio, Login, Password, Role)`, **никакой дополнительной настройки не требуется**.
 
 ---
 
