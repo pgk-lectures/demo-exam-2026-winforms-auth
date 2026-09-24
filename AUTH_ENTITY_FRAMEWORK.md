@@ -159,26 +159,6 @@ public class AppDbContext : DbContext
             "Server=localhost;Database=DemoExam2026;Trusted_Connection=True;TrustServerCertificate=True;");
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>()
-            .Property(user => user.Role)
-            .HasConversion(
-                role => role switch
-                {
-                    UserRole.AuthorizedClient => "Авторизованный клиент",
-                    UserRole.Manager => "Менеджер",
-                    UserRole.Administrator => "Администратор",
-                    _ => throw new ArgumentOutOfRangeException()
-                },
-                value => value switch
-                {
-                    "Авторизованный клиент" => UserRole.AuthorizedClient,
-                    "Менеджер" => UserRole.Manager,
-                    "Администратор" => UserRole.Administrator,
-                    _ => throw new ArgumentOutOfRangeException()
-                });
-    }
 }
 ~~~
 
@@ -1132,13 +1112,15 @@ AuthService
 
 Проверьте точное значение Role в БД.
 
-Например:
+В этой инструкции используются одинаковые значения в БД и C#:
 
 ~~~text
-Администратор
+AuthorizedClient
+Manager
+Administrator
 ~~~
 
-должно соответствовать значению, которое проверяется в switch.
+Поэтому Role из БД напрямую соответствует UserRole в C#.
 
 Проблемой могут стать:
 
@@ -1200,7 +1182,7 @@ MainForm
 ↓
 интерфейс
 
-UserUserRole
+UserRole
 ↓
 права
 
