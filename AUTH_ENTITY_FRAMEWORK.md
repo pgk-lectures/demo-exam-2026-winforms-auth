@@ -163,7 +163,21 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<User>()
             .Property(user => user.Role)
-            .HasConversion<string>();
+            .HasConversion(
+                role => role switch
+                {
+                    UserRole.AuthorizedClient => "Авторизованный клиент",
+                    UserRole.Manager => "Менеджер",
+                    UserRole.Administrator => "Администратор",
+                    _ => throw new ArgumentOutOfRangeException()
+                },
+                value => value switch
+                {
+                    "Авторизованный клиент" => UserRole.AuthorizedClient,
+                    "Менеджер" => UserRole.Manager,
+                    "Администратор" => UserRole.Administrator,
+                    _ => throw new ArgumentOutOfRangeException()
+                });
     }
 }
 ~~~
@@ -172,7 +186,7 @@ public class AppDbContext : DbContext
 
 **DbContext** — основной класс EF Core для работы с базой.
 
-`UserRole` — C#-перечисление с допустимыми ролями. В базе роль хранится как текстовое значение, поэтому `HasConversion<string>()` говорит EF Core сохранять и читать enum как строку.
+`UserRole` — C#-перечисление с допустимыми ролями. В базе роль хранится как текстовое значение, поэтому настройка `HasConversion(...)` говорит EF Core, какое текстовое значение сохранять в столбец `Role` для каждой роли и как преобразовать его обратно в `UserRole`.
 
 Строка:
 
@@ -1186,7 +1200,7 @@ MainForm
 ↓
 интерфейс
 
-UserRole
+UserUserRole
 ↓
 права
 
