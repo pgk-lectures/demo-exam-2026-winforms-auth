@@ -27,7 +27,7 @@
 | **Password** | пароль |
 | **Role** | роль |
 
-Если в вашей базе таблица или поля называются иначе, **не нужно переделывать базу только ради этого примера**. Просто замените имена в классе **User** и настройке **OnModelCreating**.
+Если в вашей базе таблица или поля называются иначе, **не нужно переделывать базу только ради этого примера**. Просто приведите модель **User** в соответствие с вашей базой.
 
 Роли из задания:
 
@@ -152,29 +152,6 @@ public class AppDbContext : DbContext
             "Server=localhost;Database=DemoExam2026;Trusted_Connection=True;TrustServerCertificate=True;");
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>().ToTable("Users");
-
-        modelBuilder.Entity<User>()
-            .HasKey(user => user.Id);
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Fio)
-            .HasColumnName("Fio");
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Login)
-            .HasColumnName("Login");
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Password)
-            .HasColumnName("Password");
-
-        modelBuilder.Entity<User>()
-            .Property(user => user.Role)
-            .HasColumnName("Role");
-    }
 }
 ~~~
 
@@ -640,7 +617,7 @@ fio
 Fio
 ~~~
 
-Настройте соответствие через **HasColumnName**.
+Приведите имя свойства модели в соответствие с реальным столбцом базы.
 
 ### Ошибка 3. Неправильная строка подключения
 
@@ -1131,7 +1108,7 @@ AuthService
 
 Если ошибка подключения — сначала проверяйте SQL Server и connection string.
 
-Если ошибка таблицы — проверяйте mapping.
+Если ошибка связана с таблицей или столбцом — проверьте соответствие модели структуре БД.
 
 Если пользователь не находится — проверяйте данные в БД.
 
